@@ -1,0 +1,7 @@
+{
+    "preset": "google",
+    "excludeFiles": [
+        "test/data/**",
+        "node_modules/**"
+    ]
+}
