@@ -11,3 +11,7 @@ indent_size = 4
 
 [*.{md,rst}]
 trim_trailing_whitespace = false
+
+# Matches the exact files package.json and .travis.yml
+[{package.json,.travis.yml}]
+indent_size = 2

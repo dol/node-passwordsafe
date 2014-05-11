@@ -2,6 +2,8 @@
 
 Read and write '[Password Safe Database](http://pwsafe.org/)'. Write support not implemented yet.
 
+[![build status](https://secure.travis-ci.org/dol/node-passwordsafe.png)](http://travis-ci.org/dol/node-passwordsafe)
+
 # example
 
 ## read.js
