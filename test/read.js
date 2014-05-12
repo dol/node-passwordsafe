@@ -75,7 +75,9 @@ describe('Loading the test database', function() {
             record1.getNotes().should.be.exactly('notes1');
             record1.getUrl().should.be.exactly('url1');
             record1.getEMailAddress().should.be.exactly('email1');
-            record1.getCreationTime().toString().should.be.exactly('Tue May 06 2014 00:52:25 GMT+0200 (CEST)');
+            record1.getCreationTime().getTime().should.be.exactly(
+                new Date('Tue May 06 2014 00:52:25 GMT+0200 (CEST)').getTime()
+            );
             // Clear record1
             record1 = null;
 
@@ -87,7 +89,9 @@ describe('Loading the test database', function() {
             record2.getNotes().should.be.exactly('notes2');
             record2.getUrl().should.be.exactly('url2');
             record2.getEMailAddress().should.be.exactly('email2');
-            record2.getCreationTime().toString().should.be.exactly('Tue May 06 2014 01:03:09 GMT+0200 (CEST)');
+            record2.getCreationTime().getTime().should.be.exactly(
+                new Date('Tue May 06 2014 01:03:09 GMT+0200 (CEST)').getTime()
+            );
             // Clear record2
             record2 = null;
 
@@ -99,8 +103,10 @@ describe('Loading the test database', function() {
             record3.getUrl().should.be.exactly('group.url1');
             record3.getEMailAddress().should.be.exactly('group.email1');
             record3.getNotes().should.be.exactly('group.notes1');
-            record3.getCreationTime().toString().should.be.exactly('Tue May 06 2014 01:04:32 GMT+0200 (CEST)');
 
+            record3.getCreationTime().getTime().should.be.exactly(
+                new Date('Tue May 06 2014 01:04:32 GMT+0200 (CEST)').getTime()
+            );
             done();
         });
     });
