@@ -100,7 +100,7 @@ describe('Loading the test database', function() {
             record3.getEMailAddress().should.be.exactly('group.email1');
             record3.getNotes().should.be.exactly('group.notes1');
             record3.getCreationTime().toString().should.be.exactly('Tue May 06 2014 01:04:32 GMT+0200 (CEST)');
-            console.log(result);
+
             done();
         });
     });
