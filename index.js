@@ -71,7 +71,6 @@ function PasswordSafe(opts) {
     };
 
     var readBlock = function(binaryParser, decryptor) {
-        // Todo: Replace with block size
         var blockWordArray = WordArray.from_buffer(
             binaryParser
             .buffer('block', TwoFish.prototype.blockSize)
