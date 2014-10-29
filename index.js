@@ -92,15 +92,14 @@ function PasswordSafe(opts) {
         var fieldType = fistBlock.readUInt8(4);
         var fieldData;
 
-        // Todo: Replace with block size
-        var TwoFishBlockSize = TwoFish.prototype.blockSize;
-        if (fieldLength <= TwoFishBlockSize - 5) {
+        var twoFishBlockSize = TwoFish.prototype.blockSize;
+        if (fieldLength <= twoFishBlockSize - 5) {
             fieldData = fistBlock.slice(5, 5 + fieldLength);
         } else {
-            fieldData = fistBlock.slice(5, TwoFishBlockSize);
-            fieldLength -= TwoFishBlockSize - 5;
+            fieldData = fistBlock.slice(5, twoFishBlockSize);
+            fieldLength -= twoFishBlockSize - 5;
             while (fieldLength > 0) {
-                var missingLength = Math.min(TwoFishBlockSize, fieldLength);
+                var missingLength = Math.min(twoFishBlockSize, fieldLength);
                 fieldData = Buffer.concat(
                     [
                         fieldData,
