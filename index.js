@@ -32,14 +32,14 @@ function PasswordSafe(opts) {
     }
     opts.password = opts.password || '';
 
-    var stretchPassword = function(password, salt, interations) {
+    var stretchPassword = function(password, salt, iterations) {
         var stretchedPassword = crypto
             .createHash('sha256')
             .update(password)
             .update(salt, 'binary')
             .digest();
         // Stretch password
-        for (var i = 0; i < interations; i++) {
+        for (var i = 0; i < iterations; i++) {
             stretchedPassword = crypto.
             createHash('sha256').
             update(stretchedPassword).
@@ -121,7 +121,7 @@ function PasswordSafe(opts) {
         var parsedData = binary.parse(dbBuffer)
             .buffer('tag', 4)
             .buffer('salt', 32)
-            .word32lu('interations')
+            .word32lu('iterations')
             .buffer('hashStretchedPassword', 32)
             .buffer('b1', 16)
             .buffer('b2', 16)
@@ -139,7 +139,7 @@ function PasswordSafe(opts) {
         var stretchedPassword = stretchPassword(
             opts.password,
             parsedData.salt,
-            parsedData.interations
+            parsedData.iterations
         );
 
         if (!checkPassword(stretchedPassword, parsedData.hashStretchedPassword)) {
