@@ -118,8 +118,8 @@ function PasswordSafe(opts) {
         };
     };
 
-    self.load = function(dbBuffer, callback) {
-        var parsedData = binary.parse(dbBuffer)
+    self.load = function(databaseBuffer, callback) {
+        var parsedData = binary.parse(databaseBuffer)
             .buffer('tag', 4)
             .buffer('salt', 32)
             .word32lu('iterations')
@@ -129,7 +129,7 @@ function PasswordSafe(opts) {
             .buffer('b3', 16)
             .buffer('b4', 16)
             .buffer('iv', 16)
-            .buffer('encryptedData', dbBuffer.length - 200)
+            .buffer('encryptedData', databaseBuffer.length - 200)
             .buffer('eof', 16)
             .buffer('hmac', 32)
             .vars;
