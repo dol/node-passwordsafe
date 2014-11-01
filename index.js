@@ -8,6 +8,7 @@ var WordArray = require('triplesec').WordArray;
 var TwoFish = require('triplesec').ciphers.TwoFish;
 var bufferEqual = require('buffer-equal');
 var DatabaseRecord = require('./lib/database_record');
+var HeaderRecord = require('./lib/header_record');
 
 function PasswordSafe(opts) {
     var self = this;
@@ -155,28 +156,30 @@ function PasswordSafe(opts) {
 
         var encryptedDataParser = binary.parse(parsedData.encryptedData);
 
-        var headerRecords = [];
+        var headerRawFields = [];
         // Read headers
         readHeaders: while (true) {
-            var recordHeader = readField(encryptedDataParser, decryptor);
-            switch (recordHeader.fieldType) {
+            var headerField = readField(encryptedDataParser, decryptor);
+            switch (headerField.fieldType) {
                 case 0xff:
                     break readHeaders;
                 default:
-                    hmacSHA256.write(recordHeader.fieldData);
-                    headerRecords[recordHeader.fieldType] = recordHeader.fieldData;
+                    hmacSHA256.write(headerField.fieldData);
+                    headerRawFields[headerField.fieldType] = headerField.fieldData;
                     break;
             }
         }
 
-        var records = [];
+        var headerRecord = new HeaderRecord(headerRawFields);
+
+        var databaseRecords = [];
         var currentRecord = [];
         readRecords: while (false === encryptedDataParser.eof()) {
             var recordData = readField(encryptedDataParser, decryptor);
             switch (recordData.fieldType) {
                 case 0xff:
                     var recordObj = new DatabaseRecord(currentRecord);
-                    records[recordObj.getUUID()] = recordObj;
+                    databaseRecords[recordObj.getUUID()] = recordObj;
                     currentRecord = [];
                     break;
                 default:
