@@ -160,11 +160,11 @@ function PasswordSafe(opts) {
         // Read headers
         readHeaders: while (true) {
             var headerField = readField(encryptedDataParser, decryptor);
+            hmacSHA256.write(headerField.fieldData);
             switch (headerField.fieldType) {
                 case 0xff:
                     break readHeaders;
                 default:
-                    hmacSHA256.write(headerField.fieldData);
                     headerRawFields[headerField.fieldType] = headerField.fieldData;
                     break;
             }
@@ -176,6 +176,7 @@ function PasswordSafe(opts) {
         var currentRecord = [];
         readRecords: while (false === encryptedDataParser.eof()) {
             var recordData = readField(encryptedDataParser, decryptor);
+            hmacSHA256.write(recordData.fieldData);
             switch (recordData.fieldType) {
                 case 0xff:
                     var recordObj = new DatabaseRecord(currentRecord);
@@ -183,7 +184,6 @@ function PasswordSafe(opts) {
                     currentRecord = [];
                     break;
                 default:
-                    hmacSHA256.write(recordData.fieldData);
                     currentRecord[recordData.fieldType] = recordData.fieldData;
                     break;
             }
