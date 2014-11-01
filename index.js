@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('./lib/utils');
 var binary = require('binary');
 var Buffer = require('buffer').Buffer;
@@ -5,7 +7,7 @@ var crypto = require('crypto');
 var WordArray = require('triplesec').WordArray;
 var TwoFish = require('triplesec').ciphers.TwoFish;
 var bufferEqual = require('buffer-equal');
-var Record = require('./lib/record');
+var DatabaseRecord = require('./lib/database_record');
 
 function PasswordSafe(opts) {
     var self = this;
@@ -173,7 +175,7 @@ function PasswordSafe(opts) {
             var recordData = readField(encryptedDataParser, decryptor);
             switch (recordData.fieldType) {
                 case 0xff:
-                    var recordObj = new Record(currentRecord);
+                    var recordObj = new DatabaseRecord(currentRecord);
                     records[recordObj.getUUID()] = recordObj;
                     currentRecord = [];
                     break;

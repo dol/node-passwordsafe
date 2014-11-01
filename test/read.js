@@ -62,12 +62,12 @@ describe('Loading the test database', function() {
 
             result.should.be.instanceof(Array);
             result.should.have.keys(
-                'ba8bd21f2ce941adb540a5d8f9798a38',
-                '15d7a4bd77c648fabea2d0b3aa46d6c6',
-                '70b290a240a14454afca25b8859df609'
+                'ba8bd21f-2ce9-41ad-b540-a5d8f9798a38',
+                '15d7a4bd-77c6-48fa-bea2-d0b3aa46d6c6',
+                '70b290a2-40a1-4454-afca-25b8859df609'
             );
 
-            var record1 = result['ba8bd21f2ce941adb540a5d8f9798a38'];
+            var record1 = result['ba8bd21f-2ce9-41ad-b540-a5d8f9798a38'];
             (null === record1.getGroup()).should.be.true;
             record1.getTitle().should.be.exactly('title1');
             record1.getUsername().should.be.exactly('username1');
@@ -81,7 +81,7 @@ describe('Loading the test database', function() {
             // Clear record1
             record1 = null;
 
-            var record2 = result['15d7a4bd77c648fabea2d0b3aa46d6c6'];
+            var record2 = result['15d7a4bd-77c6-48fa-bea2-d0b3aa46d6c6'];
             (null === record2.getGroup()).should.be.true;
             record2.getTitle().should.be.exactly('title2');
             record2.getUsername().should.be.exactly('username2');
@@ -95,7 +95,7 @@ describe('Loading the test database', function() {
             // Clear record2
             record2 = null;
 
-            var record3 = result['70b290a240a14454afca25b8859df609'];
+            var record3 = result['70b290a2-40a1-4454-afca-25b8859df609'];
             record3.getGroup().should.be.exactly('group');
             record3.getTitle().should.be.exactly('group.title1');
             record3.getUsername().should.be.exactly('group.username1');
