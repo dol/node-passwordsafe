@@ -24,10 +24,10 @@ function PasswordSafe(opts) {
         0x0307: 'V3.22',
         0x0308: 'V3.25',
         0x0309: 'V3.26',
-        0x030A: 'V3.28',
-        0x030B: 'V3.29',
-        0x030C: 'V3.29Y',
-        0x030D: 'V3.30',
+        0x030a: 'V3.28',
+        0x030b: 'V3.29',
+        0x030c: 'V3.29Y',
+        0x030d: 'V3.30',
     };
 
     if (typeof(opts) === 'undefined') {
