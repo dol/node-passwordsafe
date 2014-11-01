@@ -38,6 +38,7 @@
     "should": "~3.3.0"
   },
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "mocha --reporter spec",
+    "update-spec": "curl -o doc/formatV3.txt --fail --silent --show-error http://sourceforge.net/p/passwordsafe/git-code/ci/master/tree/docs/formatV3.txt?format=raw"
   }
 }
