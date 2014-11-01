@@ -164,6 +164,12 @@ function PasswordSafe(opts) {
             switch (headerField.fieldType) {
                 case 0xff:
                     break readHeaders;
+                case 0x11:
+                    if (!(0x11 in headerRawFields)) {
+                        headerRawFields[0x11] = [];
+                    }
+                    headerRawFields[0x11].push(headerField.fieldData);
+                    break;
                 default:
                     headerRawFields[headerField.fieldType] = headerField.fieldData;
                     break;
