@@ -56,9 +56,10 @@ describe('Loading the test database', function() {
         var safe = new PasswordSafe({
             password: '123456'
         });
-        safe.load(psafe3Data, function(err, databaseRecords) {
+        safe.load(psafe3Data, function(err, databaseRecords, headerRecord) {
             should.not.exist(err);
             should.exist(databaseRecords);
+            should.exist(headerRecord);
 
             databaseRecords.should.be.instanceof(Array);
             databaseRecords.should.have.keys(
@@ -107,6 +108,8 @@ describe('Loading the test database', function() {
             record3.getCreationTime().getTime().should.be.exactly(
                 new Date('Tue May 06 2014 01:04:32 GMT+0200 (CEST)').getTime()
             );
+
+            headerRecord.getUUID().should.be.exactly('aedb9da0-2cc7-478a-b14d-1d226cdaec19');
             done();
         });
     });
