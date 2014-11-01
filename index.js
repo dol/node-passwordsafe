@@ -193,8 +193,9 @@ function PasswordSafe(opts) {
             return callback('Database integrity check (HMAC) went wrong.');
         }
 
-        callback(null, records);
+        callback(null, databaseRecords, headerRecord);
     };
+
 }
 
 module.exports = PasswordSafe;
