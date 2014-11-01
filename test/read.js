@@ -112,7 +112,6 @@ describe('Loading the test database', function() {
             safe.versionMapping[headerRecord.getVersion()].should.be.exactly('V3.30');
             headerRecord.getUUID().should.be.exactly('aedb9da0-2cc7-478a-b14d-1d226cdaec19');
             headerRecord.getNonDefaultPreferences().should.be.exactly('I 11 2');
-            console.log(headerRecord.getLastSaveTime());
             headerRecord.getLastSaveTime().getTime().should.be.exactly(
                 new Date('Tue May 06 2014 01:50:02 GMT+0200 (CEST)').getTime()
             );
