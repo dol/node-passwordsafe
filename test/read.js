@@ -56,7 +56,7 @@ describe('Loading the test database', function() {
         var safe = new PasswordSafe({
             password: '123456'
         });
-        safe.load(psafe3Data, function(err, databaseRecords, headerRecord) {
+        safe.load(psafe3Data, function(err, headerRecord, databaseRecords) {
             should.not.exist(err);
             should.exist(databaseRecords);
             should.exist(headerRecord);

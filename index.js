@@ -62,15 +62,26 @@ function PasswordSafe(opts) {
         return bufferEqual(hmacSHA256.read(), hmacExpected);
     };
 
-    var deriveKey = function(stretchedPassword, bA, bB) {
+    var reduceKey = function(stretchedPassword, bA, bB) {
         var twoFish = new TwoFish(WordArray.from_buffer(stretchedPassword));
         var bAWordArray = WordArray.from_buffer(bA);
         var bBWordArray = WordArray.from_buffer(bB);
-        // The data will be encrypted and replaces the old data
+        // The data will be decrypted and replaces the old data
         twoFish.decryptBlock(bAWordArray.words);
         twoFish.decryptBlock(bBWordArray.words);
         // Combine and return
         return bAWordArray.concat(bBWordArray);
+    };
+
+    var deriveKey = function(stretchedPassword, key) {
+        var twoFish = new TwoFish(WordArray.from_buffer(stretchedPassword));
+        var bAWordArray = WordArray.from_buffer(key.slice(0, 16));
+        var bBWordArray = WordArray.from_buffer(key.slice(16));
+        // The data will be encrypted and replaces the old data
+        twoFish.encryptBlock(bAWordArray.words);
+        twoFish.encryptBlock(bBWordArray.words);
+        // Combine and return
+        return bAWordArray.concat(bBWordArray).to_buffer();
     };
 
     var readBlock = function(binaryParser, decryptor) {
@@ -94,12 +105,13 @@ function PasswordSafe(opts) {
         var fieldType = fistBlock.readUInt8(4);
         var fieldData;
 
+        var sizeAndTypeLenght = 5;
         var twoFishBlockSize = TwoFish.prototype.blockSize;
-        if (fieldLength <= twoFishBlockSize - 5) {
-            fieldData = fistBlock.slice(5, 5 + fieldLength);
+        if (fieldLength <= twoFishBlockSize - sizeAndTypeLenght) {
+            fieldData = fistBlock.slice(sizeAndTypeLenght, sizeAndTypeLenght + fieldLength);
         } else {
-            fieldData = fistBlock.slice(5, twoFishBlockSize);
-            fieldLength -= twoFishBlockSize - 5;
+            fieldData = fistBlock.slice(sizeAndTypeLenght, twoFishBlockSize);
+            fieldLength -= twoFishBlockSize - sizeAndTypeLenght;
             while (fieldLength > 0) {
                 var missingLength = Math.min(twoFishBlockSize, fieldLength);
                 fieldData = Buffer.concat(
@@ -147,8 +159,8 @@ function PasswordSafe(opts) {
             return callback('Wrong password provided.');
         }
 
-        var dataKey = deriveKey(stretchedPassword, parsedData.b1, parsedData.b2);
-        var hmacKey = deriveKey(stretchedPassword, parsedData.b3, parsedData.b4);
+        var dataKey = reduceKey(stretchedPassword, parsedData.b1, parsedData.b2);
+        var hmacKey = reduceKey(stretchedPassword, parsedData.b3, parsedData.b4);
 
         var hmacSHA256 = crypto.createHmac('sha256', hmacKey.to_buffer());
 
@@ -199,9 +211,125 @@ function PasswordSafe(opts) {
             return callback('Database integrity check (HMAC) went wrong.');
         }
 
-        callback(null, databaseRecords, headerRecord);
+        callback(null, headerRecord, databaseRecords);
     };
 
+    var packData = function(headerRecord, databaseRecords, password) {
+        var tag = new Buffer('PWS3', 'ascii');
+        var salt = crypto.randomBytes(32);
+        var iterations = 2048;
+        var iterationsBuffer = new Buffer(4);
+        iterationsBuffer.writeUInt32LE(iterations, 0);
+        // May increase in the future => make is configurable
+        var stretchedPassword = stretchPassword(
+            password,
+            salt,
+            iterations
+        );
+        var hashStretchedPassword = crypto.createHash('sha256').update(stretchedPassword).digest();
+
+        var dataKey = crypto.randomBytes(32);
+        var hmacKey = crypto.randomBytes(32);
+
+        var derivedDataKey = deriveKey(stretchedPassword, dataKey);
+
+        var derivedHmacKey = deriveKey(stretchedPassword, hmacKey);
+
+        var hmacSHA256 = crypto.createHmac('sha256', hmacKey);
+
+        var iv = crypto.randomBytes(16);
+
+        var encryptor = util.EncryptorTwoFishCBC(WordArray.from_buffer(dataKey), iv);
+
+        var headerRawFields = headerRecord.getRawFields();
+
+        // Make sure the 'end of entry' field is always last
+        delete headerRawFields[0xff];
+        headerRawFields[0xff] = new Buffer(0);
+
+        var encryptedHeaderFields = [];
+        for (var headerFieldType in headerRawFields) {
+            if ((0x11).toString() === headerFieldType) {
+                var emptyGroupsFields = headerRawFields[headerFieldType];
+                for (var emptyGroupId in emptyGroupsFields) {
+                    hmacSHA256.write(emptyGroupsFields[emptyGroupId]);
+                    encryptedHeaderFields.push(writeField(headerFieldType, emptyGroupsFields[emptyGroupId], encryptor));
+                }
+            } else {
+                hmacSHA256.write(headerRawFields[headerFieldType]);
+                encryptedHeaderFields.push(writeField(headerFieldType, headerRawFields[headerFieldType], encryptor));
+            }
+        }
+
+        var encryptedHeaderRecord = Buffer.concat(encryptedHeaderFields);
+
+        var encryptedDatabaseFields = [];
+        for (var recordId in databaseRecords) {
+            var databaseRawFields = databaseRecords[recordId].getRawFields();
+            // Make sure the 'end of entry' field is always last
+            delete databaseRawFields[0xff];
+            databaseRawFields[0xff] = new Buffer(0);
+            for (var databaseFieldType in databaseRawFields) {
+                hmacSHA256.write(databaseRawFields[databaseFieldType]);
+                encryptedDatabaseFields.push(writeField(databaseFieldType, databaseRawFields[databaseFieldType], encryptor));
+            }
+        }
+
+        var eof = new Buffer('PWS3-EOFPWS3-EOF', 'ascii');
+
+        // Close hmac to generate the finale hash
+        hmacSHA256.end();
+
+        var packedData = Buffer.concat([
+            tag,
+            salt,
+            iterationsBuffer,
+            hashStretchedPassword,
+            derivedDataKey,
+            derivedHmacKey,
+            iv,
+            encryptedHeaderRecord,
+            Buffer.concat(encryptedDatabaseFields),
+            eof,
+            hmacSHA256.read(),
+        ]);
+
+        return packedData;
+    };
+
+    var writeBlock = function(block, encryptor) {
+        var blockWordArray = WordArray.from_buffer(block.slice(0, TwoFish.prototype.blockSize));
+
+        var encryptBlock = new WordArray(encryptor
+            .finalize(blockWordArray)
+            .words
+        );
+        return encryptBlock.to_buffer();
+    };
+
+    var writeField = function(headerFieldType, data, encryptor) {
+        var encryptedBlocks = [];
+
+        var twoFishBlockSize = TwoFish.prototype.blockSize;
+        var sizeAndTypeLenght = 5;
+        var fieldLength = sizeAndTypeLenght + data.length;
+
+        // Round up to the next multiplier of the twofish block size (16 bytes) up with random bytes.
+        var blockData = crypto.randomBytes(Math.ceil(fieldLength / twoFishBlockSize) * twoFishBlockSize);
+        blockData.writeUInt32LE(data.length, 0);
+        blockData.writeUInt8(headerFieldType, 4);
+        data.copy(blockData, sizeAndTypeLenght);
+
+        while (blockData.length > 0) {
+            encryptedBlocks.push(writeBlock(blockData, encryptor).slice(0, TwoFish.prototype.blockSize));
+            blockData = blockData.slice(twoFishBlockSize);
+        }
+        return Buffer.concat(encryptedBlocks);
+    };
+
+    self.store = function(headerRecord, databaseRecords) {
+        return packData(headerRecord, databaseRecords, opts.password);
+    };
 }
 
 module.exports = PasswordSafe;
