@@ -330,6 +330,12 @@ function PasswordSafe(opts) {
     self.store = function(headerRecord, databaseRecords) {
         return packData(headerRecord, databaseRecords, opts.password);
     };
+
+    self.createMinimalHeaderRecord = function() {
+        var headerRecord = new HeaderRecord();
+        headerRecord.setVersion(0x030d);
+        return headerRecord;
+    };
 }
 
 module.exports = PasswordSafe;
