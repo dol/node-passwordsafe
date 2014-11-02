@@ -62,13 +62,9 @@ describe('Loading the test database', function() {
             should.exist(headerRecord);
 
             databaseRecords.should.be.instanceof(Array);
-            databaseRecords.should.have.keys(
-                'ba8bd21f-2ce9-41ad-b540-a5d8f9798a38',
-                '15d7a4bd-77c6-48fa-bea2-d0b3aa46d6c6',
-                '70b290a2-40a1-4454-afca-25b8859df609'
-            );
+            databaseRecords.should.have.lengthOf(3);
 
-            var record1 = databaseRecords['ba8bd21f-2ce9-41ad-b540-a5d8f9798a38'];
+            var record1 = databaseRecords[2];
             (null === record1.getGroup()).should.be.true;
             record1.getTitle().should.be.exactly('title1');
             record1.getUsername().should.be.exactly('username1');
@@ -82,7 +78,7 @@ describe('Loading the test database', function() {
             // Clear record1
             record1 = null;
 
-            var record2 = databaseRecords['15d7a4bd-77c6-48fa-bea2-d0b3aa46d6c6'];
+            var record2 = databaseRecords[0];
             (null === record2.getGroup()).should.be.true;
             record2.getTitle().should.be.exactly('title2');
             record2.getUsername().should.be.exactly('username2');
@@ -96,7 +92,7 @@ describe('Loading the test database', function() {
             // Clear record2
             record2 = null;
 
-            var record3 = databaseRecords['70b290a2-40a1-4454-afca-25b8859df609'];
+            var record3 = databaseRecords[1];
             record3.getGroup().should.be.exactly('group');
             record3.getTitle().should.be.exactly('group.title1');
             record3.getUsername().should.be.exactly('group.username1');

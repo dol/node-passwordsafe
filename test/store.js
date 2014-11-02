@@ -25,11 +25,7 @@ describe('Loading the test database, store records with new password and load it
                 should.exist(newHeaderRecord);
 
                 newDatabaseRecords.should.be.instanceof(Array);
-                newDatabaseRecords.should.have.keys(
-                    'ba8bd21f-2ce9-41ad-b540-a5d8f9798a38',
-                    '15d7a4bd-77c6-48fa-bea2-d0b3aa46d6c6',
-                    '70b290a2-40a1-4454-afca-25b8859df609'
-                );
+                newDatabaseRecords.should.have.lengthOf(3);
                 done();
             });
         });

@@ -198,7 +198,7 @@ function PasswordSafe(opts) {
             switch (recordData.fieldType) {
                 case 0xff:
                     var recordObj = new DatabaseRecord(currentRecord);
-                    databaseRecords[recordObj.getUUID()] = recordObj;
+                    databaseRecords.push(recordObj);
                     currentRecord = [];
                     break;
                 default:
