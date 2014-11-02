@@ -331,11 +331,19 @@ function PasswordSafe(opts) {
         return packData(headerRecord, databaseRecords, opts.password);
     };
 
-    self.createMinimalHeaderRecord = function() {
+    self.createHeaderRecord = function() {
         var headerRecord = new HeaderRecord();
         headerRecord.setVersion(0x030d);
         return headerRecord;
     };
+
+    self.createDatabaseRecord = function(title, password) {
+        var databaseRecord = new DatabaseRecord();
+        databaseRecord.setTitle(title);
+        databaseRecord.setPassword(password);
+        return databaseRecord;
+    };
+
 }
 
 module.exports = PasswordSafe;

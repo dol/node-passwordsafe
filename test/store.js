@@ -33,13 +33,13 @@ describe('Loading the test database, store records with new password and load it
     });
 });
 
-describe('Create minimal header record and store it. Try to load the record.', function() {
+describe('Create header record and store it. Try to load the record.', function() {
     it('should be successful with the password \'123456\'', function(done) {
         var safe = new PasswordSafe({
             password: '123456'
         });
 
-        var headerRecord = safe.createMinimalHeaderRecord();
+        var headerRecord = safe.createHeaderRecord();
         var encryptedData = safe.store(headerRecord, []);
 
         safe.load(encryptedData, function(err, headerRecord, databaseRecords) {
@@ -52,21 +52,30 @@ describe('Create minimal header record and store it. Try to load the record.', f
     });
 });
 
-
-describe('Create minimal header record and store it with one database record. Try to load the record.', function() {
+describe('Create header record and store it with one database record. Try to load the record.', function() {
     it('should be successful with the password \'123456\'', function(done) {
         var safe = new PasswordSafe({
             password: '123456'
         });
 
-        var headerRecord = safe.createMinimalHeaderRecord();
-        var encryptedData = safe.store(headerRecord, [new DatabaseRecord()]);
+        var headerRecord = safe.createHeaderRecord();
+        var encryptedData = safe.store(headerRecord, [safe.createDatabaseRecord('title1 store', 'password1 store')]);
 
         safe.load(encryptedData, function(err, headerRecord, databaseRecords) {
             should.not.exist(err);
             should.exist(headerRecord);
             should.exist(databaseRecords);
             databaseRecords.should.have.lengthOf(1);
+
+            var record1 = databaseRecords[0];
+            (null === record1.getGroup()).should.be.true;
+            record1.getTitle().should.be.exactly('title1 store');
+            (null === record1.getUsername()).should.be.true;
+            record1.getPassword().should.be.exactly('password1 store');
+            (null === record1.getNotes()).should.be.true;
+            (null === record1.getUrl()).should.be.true;
+            (null === record1.getEMailAddress()).should.be.true;
+            (null === record1.getCreationTime()).should.be.true;
         });
         done();
     });

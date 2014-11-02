@@ -6,7 +6,7 @@ Read and write '[Password Safe Database](http://pwsafe.org/)'. Write support not
 
 # example
 
-## read.js
+## load.js
 
 ```js
 var PasswordSafe = require('password-safe');
@@ -19,8 +19,9 @@ var Safe = new PasswordSafe({
 });
 
 
-Safe.load(PasswordDb, function(err, records) {
-    for(var record in records) {
+Safe.load(PasswordDb, function(err, headerRecord, databaseRecords) {
+    for (var i = 0; i < databaseRecords.length; i++) {
+        var record = databaseRecords[i];
         console.log("Username: " + record.getUsername());
         console.log("Password: " + record.getPassword());
         console.log("-----------------");
@@ -37,6 +38,27 @@ Password: mypassword1
 Username: myusername2
 Password: mypassword2
 -----------------
+```
+
+## store.js
+
+```js
+var PasswordSafe = require('password-safe');
+var PasswordSafeUtil = require('password-safe/utils');
+var PasswordDb = require('fs').readFileSync('my.psafe3');
+
+
+var Safe = new PasswordSafe({
+    password: 'dbPassword',
+});
+
+var headerRecord = 
+var headerRecord = safe.createHeaderRecord();
+var databaseRecords = [
+    safe.createDatabaseRecord('title1', 'my first password entry')
+];
+var encryptedData = safe.store(headerRecord, databaseRecords);
+fs.writeFile('my_safe.psafe3', encryptedData);
 ```
 
 # install
