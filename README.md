@@ -56,6 +56,8 @@ var encryptedData = safe.store(headerRecord, databaseRecords);
 fs.writeFile('my_safe.psafe3', encryptedData);
 ```
 
+Note: Not all database record have a setter at the moment. If you need it, please PR.
+
 # install
 
 With [npm](http://npmjs.org) do:
