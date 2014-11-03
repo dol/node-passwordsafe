@@ -1,14 +1,15 @@
 'use strict';
 
 var util = require('./lib/utils');
-var binary = require('binary');
+var Binary = require('binary');
 var Buffer = require('buffer').Buffer;
+var BufferEqual = require('buffer-equal');
 var crypto = require('crypto');
-var WordArray = require('triplesec').WordArray;
-var TwoFish = require('triplesec').ciphers.TwoFish;
-var bufferEqual = require('buffer-equal');
 var DatabaseRecord = require('./lib/database_record');
 var HeaderRecord = require('./lib/header_record');
+var TwoFish = require('triplesec').ciphers.TwoFish;
+var UUID = require('node-uuid');
+var WordArray = require('triplesec').WordArray;
 
 function PasswordSafe(opts) {
     var self = this;
@@ -53,13 +54,13 @@ function PasswordSafe(opts) {
 
     var checkPassword = function(stretchedPassword, hashStretchedPassword) {
         var calcHashStretchedPassword = crypto.createHash('sha256').update(stretchedPassword).digest();
-        return bufferEqual(hashStretchedPassword, calcHashStretchedPassword);
+        return BufferEqual(hashStretchedPassword, calcHashStretchedPassword);
     };
 
     var checkHmac = function(hmacSHA256, hmacExpected) {
         // Finish the stream to calculate the hmac hash
         hmacSHA256.end();
-        return bufferEqual(hmacSHA256.read(), hmacExpected);
+        return BufferEqual(hmacSHA256.read(), hmacExpected);
     };
 
     var reduceKey = function(stretchedPassword, bA, bB) {
@@ -131,7 +132,7 @@ function PasswordSafe(opts) {
     };
 
     self.load = function(databaseBuffer, callback) {
-        var parsedData = binary.parse(databaseBuffer)
+        var parsedData = Binary.parse(databaseBuffer)
             .buffer('tag', 4)
             .buffer('salt', 32)
             .word32lu('iterations')
@@ -166,7 +167,7 @@ function PasswordSafe(opts) {
 
         var decryptor = util.DecryptorTwoFishCBC(dataKey, parsedData.iv);
 
-        var encryptedDataParser = binary.parse(parsedData.encryptedData);
+        var encryptedDataParser = Binary.parse(parsedData.encryptedData);
 
         var headerRawFields = [];
         // Read headers
@@ -341,6 +342,7 @@ function PasswordSafe(opts) {
         var databaseRecord = new DatabaseRecord();
         databaseRecord.setTitle(title);
         databaseRecord.setPassword(password);
+        databaseRecord.setUUID(UUID.v4());
         return databaseRecord;
     };
 
