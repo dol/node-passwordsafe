@@ -10,7 +10,6 @@ Read and write '[Password Safe Database](http://pwsafe.org/)'. Write support not
 
 ```js
 var PasswordSafe = require('password-safe');
-var PasswordSafeUtil = require('password-safe/utils');
 var PasswordDb = require('fs').readFileSync('my.psafe3');
 
 
@@ -44,7 +43,6 @@ Password: mypassword2
 
 ```js
 var PasswordSafe = require('password-safe');
-var PasswordSafeUtil = require('password-safe/utils');
 var PasswordDb = require('fs').readFileSync('my.psafe3');
 
 
