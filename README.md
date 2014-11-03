@@ -12,11 +12,9 @@ Read and write '[Password Safe Database](http://pwsafe.org/)'. Write support not
 var PasswordSafe = require('password-safe');
 var PasswordDb = require('fs').readFileSync('my.psafe3');
 
-
 var Safe = new PasswordSafe({
     password: 'dbPassword',
 });
-
 
 Safe.load(PasswordDb, function(err, headerRecord, databaseRecords) {
     for (var i = 0; i < databaseRecords.length; i++) {
@@ -44,7 +42,6 @@ Password: mypassword2
 ```js
 var PasswordSafe = require('password-safe');
 var PasswordDb = require('fs').readFileSync('my.psafe3');
-
 
 var Safe = new PasswordSafe({
     password: 'dbPassword',
