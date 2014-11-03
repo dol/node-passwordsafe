@@ -47,7 +47,6 @@ var Safe = new PasswordSafe({
     password: 'dbPassword',
 });
 
-var headerRecord = 
 var headerRecord = safe.createHeaderRecord();
 var databaseRecords = [
     safe.createDatabaseRecord('title1', 'my first password entry')
