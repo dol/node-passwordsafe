@@ -1,9 +1,9 @@
 'use strict';
 
 var util = require('./lib/utils');
+var bufferEqual = require('buffer-equal');
 var Binary = require('binary');
 var Buffer = require('buffer').Buffer;
-var BufferEqual = require('buffer-equal');
 var crypto = require('crypto');
 var DatabaseRecord = require('./lib/database_record');
 var HeaderRecord = require('./lib/header_record');
@@ -54,13 +54,13 @@ function PasswordSafe(opts) {
 
     var checkPassword = function(stretchedPassword, hashStretchedPassword) {
         var calcHashStretchedPassword = crypto.createHash('sha256').update(stretchedPassword).digest();
-        return BufferEqual(hashStretchedPassword, calcHashStretchedPassword);
+        return bufferEqual(hashStretchedPassword, calcHashStretchedPassword);
     };
 
     var checkHmac = function(hmacSHA256, hmacExpected) {
         // Finish the stream to calculate the hmac hash
         hmacSHA256.end();
-        return BufferEqual(hmacSHA256.read(), hmacExpected);
+        return bufferEqual(hmacSHA256.read(), hmacExpected);
     };
 
     var reduceKey = function(stretchedPassword, bA, bB) {
