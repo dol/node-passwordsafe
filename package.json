@@ -1,6 +1,6 @@
 {
   "name": "password-safe",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library to work with Password Safe files (.psafe3).",
   "author": "Dominic Luechinger",
   "keywords": [
