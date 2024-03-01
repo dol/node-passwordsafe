@@ -216,10 +216,10 @@ function PasswordSafe(opts) {
     };
 
     var packData = function(headerRecord, databaseRecords, password) {
-        var tag = new Buffer('PWS3', 'ascii');
+        var tag = Buffer.from('PWS3', 'ascii');
         var salt = crypto.randomBytes(32);
         var iterations = 2048;
-        var iterationsBuffer = new Buffer(4);
+        var iterationsBuffer = Buffer.alloc(4);
         iterationsBuffer.writeUInt32LE(iterations, 0);
         // May increase in the future => make is configurable
         var stretchedPassword = stretchPassword(
@@ -246,7 +246,7 @@ function PasswordSafe(opts) {
 
         // Make sure the 'end of entry' field is always last
         delete headerRawFields[0xff];
-        headerRawFields[0xff] = new Buffer(0);
+        headerRawFields[0xff] = Buffer.alloc(0);
 
         var encryptedHeaderFields = [];
         for (var headerFieldType in headerRawFields) {
@@ -269,14 +269,14 @@ function PasswordSafe(opts) {
             var databaseRawFields = databaseRecords[recordId].getRawFields();
             // Make sure the 'end of entry' field is always last
             delete databaseRawFields[0xff];
-            databaseRawFields[0xff] = new Buffer(0);
+            databaseRawFields[0xff] = Buffer.alloc(0);
             for (var databaseFieldType in databaseRawFields) {
                 hmacSHA256.write(databaseRawFields[databaseFieldType]);
                 encryptedDatabaseFields.push(writeField(databaseFieldType, databaseRawFields[databaseFieldType], encryptor));
             }
         }
 
-        var eof = new Buffer('PWS3-EOFPWS3-EOF', 'ascii');
+        var eof = Buffer.from('PWS3-EOFPWS3-EOF', 'ascii');
 
         // Close hmac to generate the finale hash
         hmacSHA256.end();

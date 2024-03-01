@@ -33,7 +33,7 @@ describe('Loading a database', function() {
     describe('empty input buffer', function() {
         it('should trigger an database format error', function(done) {
             var safe = new PasswordSafe();
-            safe.load(new Buffer(0), function(err, databaseRecords) {
+            safe.load(Buffer.alloc(0), function(err, databaseRecords) {
                 should.exist(err);
                 should.not.exist(databaseRecords);
                 err.should.be.exactly('Invalid database format.');
